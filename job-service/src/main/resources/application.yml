@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: deal
+
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: myGroup
+server:
+  port: 8083
