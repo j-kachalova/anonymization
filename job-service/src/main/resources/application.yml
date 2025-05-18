@@ -1,3 +1,5 @@
+server:
+  port: 8083
 spring:
   application:
     name: job-service
@@ -21,5 +23,3 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-server:
-  port: 8083

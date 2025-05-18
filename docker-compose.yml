@@ -11,8 +11,6 @@ services:
     ports:
       - "5432:5432"
 
-
-
   ruleset:
     build:
       context: ./ruleset
@@ -42,6 +40,17 @@ services:
     depends_on:
       - kafka
       - postgres
+
+  file-processing:
+    container_name: file-processing
+    build: file-processing
+    ports:
+      - 8084:8084
+    environment:
+      KAFKA_SERVER: kafka:9092
+    depends_on:
+      - kafka
+
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.11.amd64
