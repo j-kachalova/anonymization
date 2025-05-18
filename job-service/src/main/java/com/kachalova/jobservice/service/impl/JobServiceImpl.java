@@ -34,11 +34,10 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobResponseDto createJob(JobRequestDto request) {
         JobEntity job = jobMapper.toEntity(request);
-        job.setId(UUID.randomUUID());
         job.setStatus(JobStatus.CREATED);
         job.setCreatedAt(LocalDateTime.now());
         job.setUpdatedAt(LocalDateTime.now());
-        return jobMapper.toDto(jobRepository.save(job));
+        return jobMapper.toDto(jobRepository.saveAndFlush(job));
     }
 
     @Override
@@ -66,7 +65,7 @@ public class JobServiceImpl implements JobService {
                 .orElseThrow(() -> new EntityNotFoundException("Job not found"));
         jobMapper.updateEntityFromDto(request, existing);
         existing.setUpdatedAt(LocalDateTime.now());
-        return jobMapper.toDto(jobRepository.save(existing));
+        return jobMapper.toDto(jobRepository.saveAndFlush(existing));
     }
 
     @Override
@@ -83,7 +82,7 @@ public class JobServiceImpl implements JobService {
                 .orElseThrow(() -> new EntityNotFoundException("Job not found"));
         job.setStatus(JobStatus.RUNNING);
         job.setUpdatedAt(LocalDateTime.now());
-        jobRepository.save(job);
+        jobRepository.saveAndFlush(job);
 
         // Отправляем команду в Kafka
         jobCommandProducer.sendStartCommand(jobId.toString());
@@ -95,7 +94,7 @@ public class JobServiceImpl implements JobService {
                 .orElseThrow(() -> new EntityNotFoundException("Job not found"));
         job.setStatus(JobStatus.STOPPED);
         job.setUpdatedAt(LocalDateTime.now());
-        jobRepository.save(job);
+        jobRepository.saveAndFlush(job);
 
         // Отправляем команду в Kafka
         jobCommandProducer.sendStopCommand(jobId.toString());
