@@ -11,6 +11,22 @@ services:
     ports:
       - "5432:5432"
 
+  gateway:
+    build:
+      context: ./gateway  # Путь к каталогу с исходниками Gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"  # Порт для доступа к Gateway
+    depends_on:
+      - ruleset
+      - job-service
+      - file-processing
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - GATEWAY_RULESET_URI=http://ruleset:8080  # Статический URI для Ruleset Service
+      - GATEWAY_JOB_URI=http://job-service:8080        # Статический URI для Job Service
+      - GATEWAY_FILE_URI=http://file-processing:8080  # Статический URI для File Processing Service
+
   ruleset:
     build:
       context: ./ruleset
