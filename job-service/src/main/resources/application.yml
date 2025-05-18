@@ -1,6 +1,6 @@
 spring:
   application:
-    name: deal
+    name: job-service
 
   kafka:
     bootstrap-servers: kafka:9092
@@ -9,8 +9,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://postgres:5432/ruleset_db   # хост 'postgres' — это имя сервиса в docker-compose
-    username: ruleset_user                             # пользователь из docker-compose
-    password: ruleset_pass                             # пароль из docker-compose
+    username: postgres                             # пользователь из docker-compose
+    password: postgres                             # пароль из docker-compose
     driver-class-name: org.postgresql.Driver
 
   jpa:

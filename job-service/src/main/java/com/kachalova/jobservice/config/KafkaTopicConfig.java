@@ -25,7 +25,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic jobTopic() {
-        return new NewTopic("job-topic", 1, (short) 1);
+        return new NewTopic("job-commands", 1, (short) 1);
     }
 
 }
