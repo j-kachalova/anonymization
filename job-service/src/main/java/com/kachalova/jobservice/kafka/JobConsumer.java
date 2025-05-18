@@ -6,8 +6,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class JobConsumer {
 
-    @KafkaListener(topics = "jobs", groupId = "job-service-group")
-    public void listen(String message) {
+    @KafkaListener(topics = "job-commands-start", groupId = "job-service-group")
+    public void listenStart(String message) {
+        System.out.println("Received message: " + message);
+        // Здесь можно обрабатывать полученные сообщения
+    }
+    @KafkaListener(topics = "job-commands-stop", groupId = "job-service-group")
+    public void listenStop(String message) {
         System.out.println("Received message: " + message);
         // Здесь можно обрабатывать полученные сообщения
     }

@@ -28,11 +28,9 @@ public class JobServiceImpl implements JobService {
     private final JobRepository jobRepository;
     private final RuleSetRepository ruleSetRepository;  // Добавлено для доступа к RuleSetEntity
     private final JobMapper jobMapper;
-    private final KafkaTemplate<String, String> kafkaTemplate;
     private final JobCommandProducer jobCommandProducer;
 
-    private static final String START_JOB_TOPIC = "job-commands-start";
-    private static final String STOP_JOB_TOPIC = "job-commands-stop";
+
 
     @Override
     public JobResponseDto createJob(JobRequestDto request) {
@@ -98,9 +96,9 @@ public class JobServiceImpl implements JobService {
         job.setStatus(JobStatus.RUNNING);
         job.setUpdatedAt(LocalDateTime.now());
         jobRepository.saveAndFlush(job);
-
+        JobResponseDto jobResponseDto = jobMapper.toResponseDto(job);
         // Отправляем команду в Kafka для запуска джоба
-        jobCommandProducer.sendStartCommand(jobId.toString());
+        jobCommandProducer.sendStartCommand(jobResponseDto);
     }
 
     @Override
@@ -110,8 +108,8 @@ public class JobServiceImpl implements JobService {
         job.setStatus(JobStatus.STOPPED);
         job.setUpdatedAt(LocalDateTime.now());
         jobRepository.saveAndFlush(job);
-
+        JobResponseDto jobResponseDto = jobMapper.toResponseDto(job);
         // Отправляем команду в Kafka для остановки джоба
-        jobCommandProducer.sendStopCommand(jobId.toString());
+        jobCommandProducer.sendStopCommand(jobResponseDto);
     }
 }
