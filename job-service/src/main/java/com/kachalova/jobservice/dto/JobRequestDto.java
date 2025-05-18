@@ -2,11 +2,14 @@ package com.kachalova.jobservice.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 
+import java.util.UUID;
 
 
 @Data
+@Builder
 public class JobRequestDto {
 
     @NotBlank
@@ -19,7 +22,7 @@ public class JobRequestDto {
     private String outputTopic;
 
     @NotNull
-    private Long ruleSetId;
+    private RuleSetResponseDto ruleSet;
 
     private String schedule; // optional, cron expression
 }

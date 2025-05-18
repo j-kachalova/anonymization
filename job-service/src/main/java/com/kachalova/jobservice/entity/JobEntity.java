@@ -29,8 +29,9 @@ public class JobEntity {
     @Column(name = "output_topic")
     private String outputTopic;
 
-    @Column(name = "rule_set_id")
-    private Long ruleSetId;
+    @ManyToOne(fetch = FetchType.LAZY)  // Связь с RuleSetEntity
+    @JoinColumn(name = "rule_set_id", referencedColumnName = "id")  // Внешний ключ на таблицу с набором правил
+    private RuleSetEntity ruleSet;  // Ссылка на сущность RuleSetEntity
 
     private String schedule; // cron expression, может быть null
 

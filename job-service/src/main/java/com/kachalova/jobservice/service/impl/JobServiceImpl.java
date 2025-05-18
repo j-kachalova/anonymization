@@ -4,16 +4,17 @@ import com.kachalova.jobservice.dto.JobRequestDto;
 import com.kachalova.jobservice.dto.JobResponseDto;
 import com.kachalova.jobservice.entity.JobEntity;
 import com.kachalova.jobservice.entity.JobStatus;
+import com.kachalova.jobservice.entity.RuleSetEntity;
 import com.kachalova.jobservice.kafka.JobCommandProducer;
 import com.kachalova.jobservice.mapper.JobMapper;
 import com.kachalova.jobservice.repository.JobRepository;
+import com.kachalova.jobservice.repository.RuleSetRepository;
 import com.kachalova.jobservice.service.JobService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,21 +24,28 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class JobServiceImpl implements JobService {
+
     private final JobRepository jobRepository;
+    private final RuleSetRepository ruleSetRepository;  // Добавлено для доступа к RuleSetEntity
     private final JobMapper jobMapper;
-    private final KafkaTemplate<String, String> kafkaTemplate;  // Добавлено
-    private final JobCommandProducer jobCommandProducer;  // добавляем
+    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final JobCommandProducer jobCommandProducer;
+
     private static final String START_JOB_TOPIC = "job-commands-start";
     private static final String STOP_JOB_TOPIC = "job-commands-stop";
 
-
     @Override
     public JobResponseDto createJob(JobRequestDto request) {
-        JobEntity job = jobMapper.toEntity(request);
+        RuleSetEntity ruleSetEntity = ruleSetRepository.findById(request.getRuleSet().getId())
+                .orElseThrow(() -> new EntityNotFoundException("RuleSet not found"));
+
+        JobEntity job = jobMapper.toEntity(request, ruleSetEntity);  // Передаем RuleSetEntity
         job.setStatus(JobStatus.CREATED);
         job.setCreatedAt(LocalDateTime.now());
         job.setUpdatedAt(LocalDateTime.now());
-        return jobMapper.toDto(jobRepository.saveAndFlush(job));
+        jobRepository.saveAndFlush(job);
+
+        return jobMapper.toResponseDto(job);
     }
 
     @Override
@@ -49,23 +57,30 @@ public class JobServiceImpl implements JobService {
         } else {
             jobs = jobRepository.findAll(PageRequest.of(page, size)).getContent();
         }
-        return jobs.stream().map(jobMapper::toDto).collect(Collectors.toList());
+        return jobs.stream().map(jobMapper::toResponseDto).collect(Collectors.toList());
     }
 
     @Override
     public JobResponseDto getJobById(UUID jobId) {
         JobEntity job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new EntityNotFoundException("Job not found"));
-        return jobMapper.toDto(job);
+        return jobMapper.toResponseDto(job);
     }
 
     @Override
     public JobResponseDto updateJob(UUID jobId, JobRequestDto request) {
-        JobEntity existing = jobRepository.findById(jobId)
+        JobEntity existingJob = jobRepository.findById(jobId)
                 .orElseThrow(() -> new EntityNotFoundException("Job not found"));
-        jobMapper.updateEntityFromDto(request, existing);
-        existing.setUpdatedAt(LocalDateTime.now());
-        return jobMapper.toDto(jobRepository.saveAndFlush(existing));
+
+        RuleSetEntity ruleSetEntity = ruleSetRepository.findById(request.getRuleSet().getId())
+                .orElseThrow(() -> new EntityNotFoundException("RuleSet not found"));
+
+        jobMapper.updateEntityFromDto(request, existingJob);
+        existingJob.setRuleSet(ruleSetEntity);  // Обновляем связанный RuleSetEntity
+        existingJob.setUpdatedAt(LocalDateTime.now());
+
+        jobRepository.saveAndFlush(existingJob);
+        return jobMapper.toResponseDto(existingJob);
     }
 
     @Override
@@ -84,7 +99,7 @@ public class JobServiceImpl implements JobService {
         job.setUpdatedAt(LocalDateTime.now());
         jobRepository.saveAndFlush(job);
 
-        // Отправляем команду в Kafka
+        // Отправляем команду в Kafka для запуска джоба
         jobCommandProducer.sendStartCommand(jobId.toString());
     }
 
@@ -96,9 +111,7 @@ public class JobServiceImpl implements JobService {
         job.setUpdatedAt(LocalDateTime.now());
         jobRepository.saveAndFlush(job);
 
-        // Отправляем команду в Kafka
+        // Отправляем команду в Kafka для остановки джоба
         jobCommandProducer.sendStopCommand(jobId.toString());
     }
-
-
 }
