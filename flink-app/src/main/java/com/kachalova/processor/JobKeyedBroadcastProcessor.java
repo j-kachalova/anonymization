@@ -18,14 +18,17 @@ public class JobKeyedBroadcastProcessor extends KeyedBroadcastProcessFunction<St
 
     @Override
     public void processBroadcastElement(JobResponseDto job, Context ctx, Collector<PersonalData> out) throws Exception {
-        ctx.getBroadcastState(jobDescriptor).put("current", job);
+        // Сохраняем джобу по inputTopic (можно и по job.getId() при необходимости)
+        ctx.getBroadcastState(jobDescriptor).put(job.getInputTopic(), job);
         System.out.println("📡 Получена новая джоба: " + job.getId() + " -> топик: " + job.getInputTopic());
     }
 
     @Override
     public void processElement(PersonalData data, ReadOnlyContext ctx, Collector<PersonalData> out) throws Exception {
-        JobResponseDto job = ctx.getBroadcastState(jobDescriptor).get("current");
-        if (job != null && job.getInputTopic().equals(data.getSourceTopic())) {
+        // Получаем джобу по sourceTopic (откуда пришли данные)
+        JobResponseDto job = ctx.getBroadcastState(jobDescriptor).get(data.getSourceTopic());
+
+        if (job != null) {
             System.out.println("📥 Flink получил данные из топика: " + data.getSourceTopic());
             System.out.println("➡️ Обрабатываем PersonalData: " + data);
 
@@ -34,7 +37,7 @@ public class JobKeyedBroadcastProcessor extends KeyedBroadcastProcessFunction<St
             }
             out.collect(data);
         } else {
-            System.out.println("⛔ Пропущены данные из другого топика: " + data.getSourceTopic());
+            System.out.println("⛔ Джоба для топика " + data.getSourceTopic() + " не найдена. Данные пропущены.");
         }
     }
 }

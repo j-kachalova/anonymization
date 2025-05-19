@@ -1,4 +1,4 @@
-package com.kachalova.fileprocessing.service;
+package com.kachalova.fileprocessing.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kachalova.fileprocessing.dto.PersonalDataDTO;
@@ -25,9 +25,9 @@ public class FileProcessingService {
     private final ObjectMapper objectMapper;
     private final PersonalDataMapper personalDataMapper;
     private final PersonalDataRepository personalDataRepository;
-    private static final String TOPIC = "raw-topic"; // замените на ваш актуальный топик
 
-    public void processFile(MultipartFile file) {
+    public void processFile(MultipartFile file, String inputTopic) {
+
         try (CSVParser parser = new CSVParser(
                 new InputStreamReader(file.getInputStream()),
                 CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
@@ -49,9 +49,9 @@ public class FileProcessingService {
                 PersonalDataEntity entity = personalDataMapper.toEntity(dto);
                 personalDataRepository.save(entity);
                 KafkaData kafkaData = personalDataMapper.toKafkaModel(entity);
-                kafkaData.setSourceTopic(TOPIC);
+                kafkaData.setSourceTopic(inputTopic);
                 String json = objectMapper.writeValueAsString(kafkaData);
-                kafkaTemplate.send(TOPIC, json);
+                kafkaTemplate.send(inputTopic, json);
             }
 
         } catch (Exception e) {

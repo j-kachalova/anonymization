@@ -14,12 +14,13 @@ import org.springframework.stereotype.Service;
 public class JobCommandProducer {
 
     private final KafkaTemplate<String, String> kafkaTemplate; // <- теперь тип String
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    private final ObjectMapper objectMapper;
+    private final TopicService topicService;
     private static final String START_JOB_TOPIC = "job-commands-start";
     private static final String STOP_JOB_TOPIC = "job-commands-stop";
 
     public void sendStartCommand(JobResponseDto jobResponseDto) {
+        topicService.createTopic(jobResponseDto.getInputTopic(), 1, (short) 1);
         try {
             String json = objectMapper.writeValueAsString(jobResponseDto); // ✅ сериализация
             kafkaTemplate.send(START_JOB_TOPIC, json);

@@ -12,19 +12,20 @@ import { useNavigate } from 'react-router-dom';
 
 const FileUploadPage = () => {
     const [file, setFile] = useState(null);
+    const [inputTopic, setInputTopic] = useState('');
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [openSnackbar, setOpenSnackbar] = useState(false);
 
-    const navigate = useNavigate(); // для кнопки "Назад"
+    const navigate = useNavigate();
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
     };
 
     const handleFileUpload = async () => {
-        if (!file) {
-            setSnackbarMessage('Пожалуйста, выберите файл для загрузки!');
+        if (!file || !inputTopic) {
+            setSnackbarMessage('Пожалуйста, выберите файл и укажите имя топика!');
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
             return;
@@ -32,6 +33,7 @@ const FileUploadPage = () => {
 
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('inputTopic', inputTopic);
 
         try {
             const response = await axios.post('/files/upload', formData, {
@@ -43,7 +45,7 @@ const FileUploadPage = () => {
             setSnackbarSeverity('success');
             setOpenSnackbar(true);
         } catch (error) {
-            console.error('Error uploading file:', error);
+            console.error('Ошибка при загрузке файла:', error);
             setSnackbarMessage('Ошибка при обработке файла');
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
@@ -72,11 +74,21 @@ const FileUploadPage = () => {
                 <Typography variant="h4" gutterBottom>
                     Загрузить файл
                 </Typography>
+
+                <TextField
+                    label="Имя Kafka-топика"
+                    value={inputTopic}
+                    onChange={(e) => setInputTopic(e.target.value)}
+                    fullWidth
+                    style={{ marginBottom: '20px' }}
+                />
+
                 <input
                     type="file"
                     onChange={handleFileChange}
                     style={{ marginBottom: '20px' }}
                 />
+
                 <Button
                     variant="contained"
                     color="primary"
