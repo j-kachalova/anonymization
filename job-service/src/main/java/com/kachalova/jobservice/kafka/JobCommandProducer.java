@@ -1,5 +1,7 @@
 package com.kachalova.jobservice.kafka;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kachalova.jobservice.dto.JobResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,19 +13,29 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class JobCommandProducer {
 
-    private final KafkaTemplate<String, JobResponseDto> kafkaTemplate;  // Изменено на DTO
+    private final KafkaTemplate<String, String> kafkaTemplate; // <- теперь тип String
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private static final String START_JOB_TOPIC = "job-commands-start";
     private static final String STOP_JOB_TOPIC = "job-commands-stop";
 
-    // Отправляем команду старта с полным объектом JobResponseDto
     public void sendStartCommand(JobResponseDto jobResponseDto) {
-        kafkaTemplate.send(START_JOB_TOPIC, jobResponseDto);
-        log.info("Sent start command for jobId {}", jobResponseDto.getId());
+        try {
+            String json = objectMapper.writeValueAsString(jobResponseDto); // ✅ сериализация
+            kafkaTemplate.send(START_JOB_TOPIC, json);
+            log.info("✅ Sent START command as JSON for jobId {}: {}", jobResponseDto.getId(), json);
+        } catch (JsonProcessingException e) {
+            log.error("❌ Ошибка сериализации при отправке старта джобы", e);
+        }
     }
 
-    // Отправляем команду остановки с полным объектом JobResponseDto
     public void sendStopCommand(JobResponseDto jobResponseDto) {
-        kafkaTemplate.send(STOP_JOB_TOPIC, jobResponseDto);
-        log.info("Sent stop command for jobId {}", jobResponseDto.getId());
+        try {
+            String json = objectMapper.writeValueAsString(jobResponseDto);
+            kafkaTemplate.send(STOP_JOB_TOPIC, json);
+            log.info("✅ Sent STOP command as JSON for jobId {}: {}", jobResponseDto.getId(), json);
+        } catch (JsonProcessingException e) {
+            log.error("❌ Ошибка сериализации при отправке остановки джобы", e);
+        }
     }
 }

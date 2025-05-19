@@ -1,7 +1,7 @@
 package com.kachalova.fileprocessing.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kachalova.fileprocessing.FileDataDTO;
+import com.kachalova.fileprocessing.dto.PersonalData;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -20,7 +20,7 @@ public class FileProcessingService {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    private static final String TOPIC = "kafka-file-input"; // замените на ваш актуальный топик
+    private static final String TOPIC = "raw-topic"; // замените на ваш актуальный топик
 
     public void processFile(MultipartFile file) {
         try (CSVParser parser = new CSVParser(
@@ -30,7 +30,7 @@ public class FileProcessingService {
             List<CSVRecord> records = parser.getRecords();
 
             for (CSVRecord record : records) {
-                FileDataDTO dto = FileDataDTO.builder()
+                PersonalData dto = PersonalData.builder()
                         .birthDate(record.get("birthDate"))
                         .birthPlace(record.get("birthPlace"))
                         .passport(record.get("passport"))
@@ -40,6 +40,7 @@ public class FileProcessingService {
                         .inn(record.get("inn"))
                         .snils(record.get("snils"))
                         .card(record.get("card"))
+                        .sourceTopic(TOPIC)
                         .build();
 
                 String json = objectMapper.writeValueAsString(dto);

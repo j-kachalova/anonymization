@@ -8,6 +8,8 @@ spring:
     bootstrap-servers: kafka:9092
     consumer:
       group-id: job-service-group
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
   datasource:
     url: jdbc:postgresql://postgres:5432/ruleset_db   # хост 'postgres' — это имя сервиса в docker-compose

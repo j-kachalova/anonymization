@@ -27,5 +27,13 @@ public class KafkaTopicConfig {
     public NewTopic jobTopic() {
         return new NewTopic("job-commands", 1, (short) 1);
     }
+    @Bean
+    public NewTopic jobStart() {
+        return new NewTopic("job-commands-start", 1, (short) 1);
+    }
+    @Bean
+    public NewTopic jobStop() {
+        return new NewTopic("job-commands-stop", 1, (short) 1);
+    }
 
 }
