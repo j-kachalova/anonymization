@@ -1,7 +1,11 @@
 package com.kachalova.fileprocessing.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kachalova.fileprocessing.dto.PersonalDataDTO;
+import com.kachalova.fileprocessing.entity.PersonalDataEntity;
 import com.kachalova.fileprocessing.kafka.PersonalData;
+import com.kachalova.fileprocessing.mapper.PersonalDataMapper;
+import com.kachalova.fileprocessing.repository.PersonalDataRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -19,7 +23,8 @@ public class FileProcessingService {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
-
+    private final PersonalDataMapper personalDataMapper;
+    private final PersonalDataRepository personalDataRepository;
     private static final String TOPIC = "raw-topic"; // замените на ваш актуальный топик
 
     public void processFile(MultipartFile file) {
@@ -30,7 +35,7 @@ public class FileProcessingService {
             List<CSVRecord> records = parser.getRecords();
 
             for (CSVRecord record : records) {
-                PersonalData dto = PersonalData.builder()
+                PersonalDataDTO dto = PersonalDataDTO.builder()
                         .birthDate(record.get("birthDate"))
                         .birthPlace(record.get("birthPlace"))
                         .passport(record.get("passport"))
@@ -40,10 +45,12 @@ public class FileProcessingService {
                         .inn(record.get("inn"))
                         .snils(record.get("snils"))
                         .card(record.get("card"))
-                        .sourceTopic(TOPIC)
                         .build();
-
-                String json = objectMapper.writeValueAsString(dto);
+                PersonalDataEntity entity = personalDataMapper.toEntity(dto);
+                personalDataRepository.save(entity);
+                PersonalData personalData = personalDataMapper.toKafkaModel(entity);
+                personalData.setSourceTopic(TOPIC);
+                String json = objectMapper.writeValueAsString(personalData);
                 kafkaTemplate.send(TOPIC, json);
             }
 
@@ -51,4 +58,5 @@ public class FileProcessingService {
             throw new RuntimeException("Ошибка при обработке файла: " + e.getMessage(), e);
         }
     }
+
 }

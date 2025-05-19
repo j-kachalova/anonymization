@@ -6,10 +6,10 @@ import com.kachalova.fileprocessing.kafka.PersonalData;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PersonalDataMapper {
 
-    public PersonalDataEntity toEntity(PersonalDataDTO dto);
+    PersonalDataEntity toEntity(PersonalDataDTO dto);
 
-    public PersonalData toKafkaModel(PersonalDataEntity entity);
+    PersonalData toKafkaModel(PersonalDataEntity entity);
 }
