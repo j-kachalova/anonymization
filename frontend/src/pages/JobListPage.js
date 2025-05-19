@@ -1,40 +1,98 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import {
+    Button,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Typography,
+    Snackbar,
+    Alert
+} from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 
 const JobListPage = () => {
     const [jobs, setJobs] = useState([]);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch all jobs
-        const fetchJobs = async () => {
-            try {
-                const response = await axios.get('/api/jobs');
-                setJobs(response.data);  // Update state with fetched jobs
-            } catch (error) {
-                console.error('Error fetching jobs:', error);
-            }
-        };
-
         fetchJobs();
     }, []);
 
-    const handleDelete = async (jobId) => {
+    const fetchJobs = async () => {
         try {
-            await axios.delete(`/api/jobs/${jobId}`);
-            // Use the functional form of setState to ensure state is updated correctly
-            setJobs(prevJobs => prevJobs.filter(job => job.jobId !== jobId)); // Remove deleted job from the list
+            const response = await axios.get('/api/jobs');
+            setJobs(response.data);
         } catch (error) {
-            console.error('Error deleting job:', error);
+            console.error('Ошибка при получении задач:', error);
+            showSnackbar('Ошибка при загрузке задач', 'error');
         }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await axios.delete(`/api/jobs/${id}`);
+            setJobs(prevJobs => prevJobs.filter(job => job.id !== id));
+            showSnackbar('Задача удалена', 'success');
+        } catch (error) {
+            console.error('Ошибка при удалении задачи:', error);
+            showSnackbar('Не удалось удалить задачу', 'error');
+        }
+    };
+
+    const handleStartJob = async (id) => {
+        try {
+            await axios.post(`/api/jobs/${id}/start`);
+            showSnackbar('Задача запущена', 'success');
+            fetchJobs();
+        } catch (error) {
+            console.error('Ошибка при запуске задачи:', error);
+            showSnackbar('Ошибка запуска задачи', 'error');
+        }
+    };
+
+    const handleStopJob = async (id) => {
+        try {
+            await axios.post(`/api/jobs/${id}/stop`);
+            showSnackbar('Задача остановлена', 'success');
+            fetchJobs();
+        } catch (error) {
+            console.error('Ошибка при остановке задачи:', error);
+            showSnackbar('Ошибка остановки задачи', 'error');
+        }
+    };
+
+    const handleGoBack = () => {
+        navigate(-1);
+    };
+
+    const showSnackbar = (message, severity = 'success') => {
+        setSnackbarMessage(message);
+        setSnackbarSeverity(severity);
+        setSnackbarOpen(true);
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbarOpen(false);
     };
 
     return (
         <div style={{ padding: '20px' }}>
-            <Typography variant="h4" gutterBottom>
-                Список задач
-            </Typography>
+            <Button
+                variant="outlined"
+                onClick={handleGoBack}
+                style={{ marginBottom: '20px', marginRight: '10px' }}
+            >
+                Назад
+            </Button>
+
             <Button
                 variant="contained"
                 color="primary"
@@ -44,6 +102,11 @@ const JobListPage = () => {
             >
                 Добавить новую задачу
             </Button>
+
+            <Typography variant="h4" gutterBottom>
+                Список задач
+            </Typography>
+
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -55,7 +118,7 @@ const JobListPage = () => {
                     </TableHead>
                     <TableBody>
                         {jobs.map((job) => (
-                            <TableRow key={job.jobId}>
+                            <TableRow key={job.id}>
                                 <TableCell>{job.name}</TableCell>
                                 <TableCell>{job.status}</TableCell>
                                 <TableCell>
@@ -63,7 +126,7 @@ const JobListPage = () => {
                                         variant="outlined"
                                         color="primary"
                                         component={Link}
-                                        to={`/jobs/${job.jobId}`}
+                                        to={`/jobs/${job.id}`}
                                         style={{ marginRight: '10px' }}
                                     >
                                         Детали
@@ -71,9 +134,25 @@ const JobListPage = () => {
                                     <Button
                                         variant="outlined"
                                         color="secondary"
-                                        onClick={() => handleDelete(job.jobId)}
+                                        onClick={() => handleDelete(job.id)}
+                                        style={{ marginRight: '10px' }}
                                     >
                                         Удалить
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                        onClick={() => handleStartJob(job.id)}
+                                        style={{ marginRight: '10px' }}
+                                    >
+                                        Старт
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="warning"
+                                        onClick={() => handleStopJob(job.id)}
+                                    >
+                                        Стоп
                                     </Button>
                                 </TableCell>
                             </TableRow>
@@ -81,6 +160,17 @@ const JobListPage = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={4000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

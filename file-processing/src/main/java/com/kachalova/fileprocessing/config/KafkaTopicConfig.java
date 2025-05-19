@@ -24,8 +24,12 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic mysTopic() {
-        return new NewTopic("your-kafka-topic", 1, (short) 1);
+    public NewTopic input() {
+        return new NewTopic("kafka-file-input", 1, (short) 1);
+    }
+    @Bean
+    public NewTopic output() {
+        return new NewTopic("kafka-file-output", 1, (short) 1);
     }
 
 }

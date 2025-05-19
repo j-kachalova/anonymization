@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kachalova.model.AnonymizationRuleDto;
 import com.kachalova.model.JobResponseDto;
-import com.kachalova.model.Person;
+import com.kachalova.model.PersonalData;
 import com.kachalova.model.RuleSetResponseDto;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -55,16 +55,16 @@ public class FlinkJobProcessor {
             @Override
             public String map(String value) throws Exception {
                 // Преобразуем строку в объект (например, Person) если это JSON
-                Person person = parseJsonToPerson(value);
+                PersonalData personalData = parseJsonToPerson(value);
 
                 // Применяем правила из JobResponseDto
                 for (AnonymizationRuleDto rule : jobResponse.getRuleSet().getRules()) {
                     switch (rule.getMethod()) {
                         case "MASK":
-                            person = applyMasking(person, rule.getFieldName(), rule.getParameters());
+                            personalData = applyMasking(personalData, rule.getFieldName(), rule.getParameters());
                             break;
-                        case "REMOVE":
-                            person = applyRemoval(person, rule.getFieldName());
+                        case "DELETE":
+                            personalData = applyRemoval(personalData, rule.getFieldName());
                             break;
                         // Можно добавить другие методы обезличивания
                         default:
@@ -73,7 +73,7 @@ public class FlinkJobProcessor {
                 }
 
                 // Преобразуем объект обратно в строку (например, JSON)
-                return personToJson(person);
+                return personToJson(personalData);
             }
         });
 
@@ -118,40 +118,40 @@ public class FlinkJobProcessor {
     }
 
     // Преобразование строки в объект (например, через Jackson)
-    private static Person parseJsonToPerson(String value) throws JsonProcessingException {
+    private static PersonalData parseJsonToPerson(String value) throws JsonProcessingException {
         // Пример преобразования JSON строки в объект
-        return new ObjectMapper().readValue(value, Person.class);
+        return new ObjectMapper().readValue(value, PersonalData.class);
     }
 
     // Преобразование объекта обратно в JSON строку
-    private static String personToJson(Person person) throws JsonProcessingException {
+    private static String personToJson(PersonalData personalData) throws JsonProcessingException {
         // Пример преобразования объекта обратно в JSON
-        return new ObjectMapper().writeValueAsString(person);
+        return new ObjectMapper().writeValueAsString(personalData);
     }
 
     // Применение маски к полям объекта Person
-    public static Person applyMasking(Person person, String fieldName, String mask) {
+    public static PersonalData applyMasking(PersonalData personalData, String fieldName, String mask) {
         switch (fieldName) {
             case "phone":
-                person.setPhone(person.getPhone().replaceAll("(?<=\\d{3})\\d{4}", mask));
+                personalData.setPhone(personalData.getPhone().replaceAll("(?<=\\d{3})\\d{4}", mask));
                 break;
             case "email":
-                person.setEmail(person.getEmail().replaceAll("(?<=.{3}).{4}", mask));
+                personalData.setEmail(personalData.getEmail().replaceAll("(?<=.{3}).{4}", mask));
                 break;
         }
-        return person;
+        return personalData;
     }
 
     // Удаление поля из объекта Person
-    public static Person applyRemoval(Person person, String fieldName) {
+    public static PersonalData applyRemoval(PersonalData personalData, String fieldName) {
         switch (fieldName) {
             case "email":
-                person.setEmail(null);
+                personalData.setEmail(null);
                 break;
             case "phone":
-                person.setPhone(null);
+                personalData.setPhone(null);
                 break;
         }
-        return person;
+        return personalData;
     }
 }

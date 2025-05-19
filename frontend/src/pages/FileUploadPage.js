@@ -1,19 +1,27 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button, TextField, Typography, Paper, Snackbar, Alert } from '@mui/material';
+import {
+    Button,
+    TextField,
+    Typography,
+    Paper,
+    Snackbar,
+    Alert
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const FileUploadPage = () => {
     const [file, setFile] = useState(null);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [openSnackbar, setOpenSnackbar] = useState(false);
 
-    // Обработчик изменения файла
+    const navigate = useNavigate(); // для кнопки "Назад"
+
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
     };
 
-    // Обработчик отправки файла
     const handleFileUpload = async () => {
         if (!file) {
             setSnackbarMessage('Пожалуйста, выберите файл для загрузки!');
@@ -31,7 +39,7 @@ const FileUploadPage = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            setSnackbarMessage(response.data); // Сообщение от сервера
+            setSnackbarMessage(response.data);
             setSnackbarSeverity('success');
             setOpenSnackbar(true);
         } catch (error) {
@@ -42,13 +50,24 @@ const FileUploadPage = () => {
         }
     };
 
-    // Закрытие Snackbar
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
     };
 
+    const handleGoBack = () => {
+        navigate(-1);
+    };
+
     return (
         <div style={{ padding: '20px' }}>
+            <Button
+                variant="outlined"
+                onClick={handleGoBack}
+                style={{ marginBottom: '20px' }}
+            >
+                Назад
+            </Button>
+
             <Paper style={{ padding: '20px' }}>
                 <Typography variant="h4" gutterBottom>
                     Загрузить файл
@@ -67,7 +86,6 @@ const FileUploadPage = () => {
                 </Button>
             </Paper>
 
-            {/* Snackbar для уведомлений */}
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={6000}

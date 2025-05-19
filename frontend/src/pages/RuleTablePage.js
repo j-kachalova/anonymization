@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import {
+    Button,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Typography
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const RuleTablePage = () => {
     const [ruleSets, setRuleSets] = useState([]);
-    const navigate  = useNavigate();
+    const navigate = useNavigate();
 
-    // Загрузка всех наборов правил
     useEffect(() => {
         const fetchRuleSets = async () => {
             try {
@@ -21,34 +30,44 @@ const RuleTablePage = () => {
         fetchRuleSets();
     }, []);
 
-    // Удаление набора правил
     const handleDelete = async (id) => {
         try {
             await axios.delete(`/api/rulesets/${id}`);
-            setRuleSets(ruleSets.filter(ruleSet => ruleSet.id !== id)); // Удаление из состояния после успешного запроса
+            setRuleSets(ruleSets.filter(ruleSet => ruleSet.id !== id));
         } catch (error) {
             console.error('Error deleting rule set:', error);
         }
     };
 
-    // Переход на страницу с полным описанием правила
     const handleViewDetail = (id) => {
         navigate(`/rule/${id}`);
     };
 
-    // Переход на страницу добавления нового набора правил
     const handleAddRuleSet = () => {
-        navigate('/add-rule-set'); // Переход на страницу добавления нового набора правил
+        navigate('/add-rule-set');
+    };
+
+    const handleGoBack = () => {
+        navigate(-1); // Возвращает на предыдущую страницу
     };
 
     return (
         <div style={{ padding: '20px' }}>
+            {/* Кнопка "Назад" */}
+            <Button
+                variant="outlined"
+                onClick={handleGoBack}
+                style={{ marginBottom: '20px' }}
+            >
+                Назад
+            </Button>
+
             {/* Кнопка "Добавить набор правил" */}
             <Button
                 variant="contained"
                 color="primary"
                 onClick={handleAddRuleSet}
-                style={{ marginBottom: '20px' }}
+                style={{ marginBottom: '20px', marginLeft: '10px' }}
             >
                 Добавить набор правил
             </Button>

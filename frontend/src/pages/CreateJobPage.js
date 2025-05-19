@@ -1,34 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Button, TextField, FormControl, InputLabel, Select, MenuItem, Typography, Paper } from '@mui/material';
+import {
+    Button,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Typography,
+    Paper,
+    Snackbar,
+    Alert
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const CreateJobPage = () => {
     const [name, setName] = useState('');
     const [inputTopic, setInputTopic] = useState('');
     const [outputTopic, setOutputTopic] = useState('');
-    const [ruleSet, setRuleSet] = useState('');
-    const [schedule, setSchedule] = useState('');
-    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [ruleSetId, setRuleSetId] = useState('');
+    const [ruleSets, setRuleSets] = useState([]);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const fetchRuleSets = async () => {
+            try {
+                const response = await axios.get('/api/rulesets');
+                setRuleSets(response.data);
+            } catch (error) {
+                console.error('Ошибка при загрузке наборов правил:', error);
+            }
+        };
+
+        fetchRuleSets();
+    }, []);
+
     const handleCreateJob = async () => {
-        const newJob = { name, inputTopic, outputTopic, ruleSet, schedule };
+        if (!name || !inputTopic || !outputTopic || !ruleSetId) {
+            setSnackbar({ open: true, message: 'Заполните все поля', severity: 'error' });
+            return;
+        }
+
+        const newJob = {
+            name,
+            inputTopic,
+            outputTopic,
+            ruleSet: {
+                id: ruleSetId
+            }
+        };
+
         try {
             await axios.post('/api/jobs', newJob);
-            navigate('/jobs'); // Redirect after creation
+            setSnackbar({ open: true, message: 'Задача успешно создана', severity: 'success' });
+            setTimeout(() => navigate('/jobs'), 1000);
         } catch (error) {
-            console.error('Error creating job:', error);
-            setOpenSnackbar(true);
+            console.error('Ошибка при создании задачи:', error);
+            setSnackbar({ open: true, message: 'Ошибка при создании задачи', severity: 'error' });
         }
+    };
+
+    const handleGoBack = () => {
+        navigate(-1);
     };
 
     return (
         <div style={{ padding: '20px' }}>
             <Paper style={{ padding: '20px' }}>
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={handleGoBack}
+                    style={{ marginBottom: '20px' }}
+                >
+                    Назад
+                </Button>
+
                 <Typography variant="h4" gutterBottom>
                     Создать новую задачу
                 </Typography>
+
                 <TextField
                     label="Название"
                     variant="outlined"
@@ -37,6 +89,7 @@ const CreateJobPage = () => {
                     onChange={(e) => setName(e.target.value)}
                     style={{ marginBottom: '20px' }}
                 />
+
                 <TextField
                     label="Входной топик"
                     variant="outlined"
@@ -45,6 +98,7 @@ const CreateJobPage = () => {
                     onChange={(e) => setInputTopic(e.target.value)}
                     style={{ marginBottom: '20px' }}
                 />
+
                 <TextField
                     label="Выходной топик"
                     variant="outlined"
@@ -53,26 +107,22 @@ const CreateJobPage = () => {
                     onChange={(e) => setOutputTopic(e.target.value)}
                     style={{ marginBottom: '20px' }}
                 />
+
                 <FormControl fullWidth variant="outlined" style={{ marginBottom: '20px' }}>
-                    <InputLabel>Правила</InputLabel>
+                    <InputLabel>Набор правил</InputLabel>
                     <Select
-                        value={ruleSet}
-                        onChange={(e) => setRuleSet(e.target.value)}
-                        label="Правила"
+                        value={ruleSetId}
+                        onChange={(e) => setRuleSetId(e.target.value)}
+                        label="Набор правил"
                     >
-                        <MenuItem value="rule1">Правило 1</MenuItem>
-                        <MenuItem value="rule2">Правило 2</MenuItem>
-                        <MenuItem value="rule3">Правило 3</MenuItem>
+                        {ruleSets.map((rs) => (
+                            <MenuItem key={rs.id} value={rs.id}>
+                                {rs.name}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
-                <TextField
-                    label="Расписание (по cron)"
-                    variant="outlined"
-                    fullWidth
-                    value={schedule}
-                    onChange={(e) => setSchedule(e.target.value)}
-                    style={{ marginBottom: '20px' }}
-                />
+
                 <Button
                     variant="contained"
                     color="primary"
@@ -81,6 +131,21 @@ const CreateJobPage = () => {
                     Создать задачу
                 </Button>
             </Paper>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

@@ -1,47 +1,42 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button, TextField, Typography, Paper, Grid, Snackbar, Alert, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import {
+    Button, TextField, Typography, Paper, Grid,
+    Snackbar, Alert, MenuItem, Select, FormControl, InputLabel
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const AddRuleSetPage = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [rules, setRules] = useState([{ fieldName: '', method: '', parameters: '' }]);
+    const [rules, setRules] = useState([{ fieldName: '', method: '' }]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const navigate = useNavigate();
 
-    // Опции для поля fieldName
     const fieldOptions = ['birthDate', 'birthPlace', 'passport', 'address', 'phone', 'email', 'inn', 'snils', 'card'];
-
-    // Опции для поля method
     const methodOptions = ['MASK', 'HASH', 'DELETE', 'GENERALIZE'];
 
-    // Функция для добавления нового правила
     const handleAddRule = () => {
-        setRules([...rules, { fieldName: '', method: '', parameters: '' }]);
+        setRules([...rules, { fieldName: '', method: '' }]);
     };
 
-    // Функция для изменения данных конкретного правила
     const handleRuleChange = (index, field, value) => {
         const newRules = [...rules];
         newRules[index][field] = value;
         setRules(newRules);
     };
 
-    // Функция для удаления правила
     const handleDeleteRule = (index) => {
         const newRules = rules.filter((_, i) => i !== index);
         setRules(newRules);
     };
 
-    // Функция для проверки, есть ли хотя бы одно заполненное поле в правилах
     const validateForm = () => {
-        return rules.some(rule => rule.fieldName || rule.method || rule.parameters);
+        return rules.some(rule => rule.fieldName || rule.method);
     };
 
-    // Функция для обработки добавления набора правил
     const handleAddRuleSet = async () => {
         if (!validateForm()) {
             setSnackbarMessage('Правила не могут быть пустыми! Заполните хотя бы одно поле в каждом правиле.');
@@ -56,7 +51,7 @@ const AddRuleSetPage = () => {
             setSnackbarMessage('Набор правил успешно добавлен!');
             setSnackbarSeverity('success');
             setOpenSnackbar(true);
-            navigate('/'); // Перенаправление на главную страницу после добавления
+            navigate('/rules');
         } catch (error) {
             console.error('Error adding rule set:', error);
             setSnackbarMessage('Ошибка при добавлении набора правил.');
@@ -65,12 +60,10 @@ const AddRuleSetPage = () => {
         }
     };
 
-    // Функция для возвращения на предыдущую страницу
     const handleGoBack = () => {
-        navigate(-1); // Возвращает на предыдущую страницу
+        navigate(-1);
     };
 
-    // Закрытие уведомления
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
     };
@@ -78,7 +71,6 @@ const AddRuleSetPage = () => {
     return (
         <div style={{ padding: '20px' }}>
             <Paper style={{ padding: '20px' }}>
-                {/* Кнопка "Назад" */}
                 <Button
                     variant="outlined"
                     color="secondary"
@@ -91,6 +83,7 @@ const AddRuleSetPage = () => {
                 <Typography variant="h4" gutterBottom>
                     Добавить новый набор правил
                 </Typography>
+
                 <TextField
                     label="Название"
                     variant="outlined"
@@ -99,6 +92,7 @@ const AddRuleSetPage = () => {
                     onChange={(e) => setName(e.target.value)}
                     style={{ marginBottom: '20px' }}
                 />
+
                 <TextField
                     label="Описание"
                     variant="outlined"
@@ -110,14 +104,14 @@ const AddRuleSetPage = () => {
                     style={{ marginBottom: '20px' }}
                 />
 
-                {/* Поля для ввода правил анонимизации */}
                 <Typography variant="h6" gutterBottom>
                     Правила анонимизации
                 </Typography>
+
                 {rules.map((rule, index) => (
                     <div key={index} style={{ marginBottom: '20px' }}>
                         <Grid container spacing={2}>
-                            <Grid item xs={4}>
+                            <Grid item xs={6}>
                                 <FormControl fullWidth variant="outlined">
                                     <InputLabel>Поле</InputLabel>
                                     <Select
@@ -133,7 +127,7 @@ const AddRuleSetPage = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={4}>
+                            <Grid item xs={6}>
                                 <FormControl fullWidth variant="outlined">
                                     <InputLabel>Метод</InputLabel>
                                     <Select
@@ -148,15 +142,6 @@ const AddRuleSetPage = () => {
                                         ))}
                                     </Select>
                                 </FormControl>
-                            </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    label="Параметры"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={rule.parameters}
-                                    onChange={(e) => handleRuleChange(index, 'parameters', e.target.value)}
-                                />
                             </Grid>
                         </Grid>
                         <Button
@@ -188,7 +173,6 @@ const AddRuleSetPage = () => {
                 </Button>
             </Paper>
 
-            {/* Snackbar для уведомлений */}
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={6000}

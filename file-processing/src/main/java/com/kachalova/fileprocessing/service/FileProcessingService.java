@@ -20,7 +20,7 @@ public class FileProcessingService {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    private static final String TOPIC = "your-kafka-topic"; // замените на ваш актуальный топик
+    private static final String TOPIC = "kafka-file-input"; // замените на ваш актуальный топик
 
     public void processFile(MultipartFile file) {
         try (CSVParser parser = new CSVParser(
