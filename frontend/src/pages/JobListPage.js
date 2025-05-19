@@ -131,33 +131,42 @@ const JobListPage = () => {
                                     >
                                         Детали
                                     </Button>
-                                    <Button
-                                        variant="outlined"
-                                        color="secondary"
-                                        onClick={() => handleDelete(job.id)}
-                                        style={{ marginRight: '10px' }}
-                                    >
-                                        Удалить
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        color="success"
-                                        onClick={() => handleStartJob(job.id)}
-                                        style={{ marginRight: '10px' }}
-                                    >
-                                        Старт
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        color="warning"
-                                        onClick={() => handleStopJob(job.id)}
-                                    >
-                                        Стоп
-                                    </Button>
+
+                                    {job.status !== 'RUNNING' && (
+                                        <>
+                                            <Button
+                                                variant="outlined"
+                                                color="secondary"
+                                                onClick={() => handleDelete(job.id)}
+                                                style={{ marginRight: '10px' }}
+                                            >
+                                                Удалить
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                color="success"
+                                                onClick={() => handleStartJob(job.id)}
+                                                style={{ marginRight: '10px' }}
+                                            >
+                                                Старт
+                                            </Button>
+                                        </>
+                                    )}
+
+                                    {job.status === 'RUNNING' && (
+                                        <Button
+                                            variant="contained"
+                                            color="warning"
+                                            onClick={() => handleStopJob(job.id)}
+                                        >
+                                            Стоп
+                                        </Button>
+                                    )}
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
+
                 </Table>
             </TableContainer>
 

@@ -21,6 +21,17 @@ public class JobKeyedBroadcastProcessor extends KeyedBroadcastProcessFunction<St
         // Сохраняем джобу по inputTopic (можно и по job.getId() при необходимости)
         ctx.getBroadcastState(jobDescriptor).put(job.getInputTopic(), job);
         System.out.println("📡 Получена новая джоба: " + job.getId() + " -> топик: " + job.getInputTopic());
+        if (job.getStatus().equals("STOPPED")) {
+            if (ctx.getBroadcastState(jobDescriptor).contains(job.getInputTopic())) {
+                ctx.getBroadcastState(jobDescriptor).remove(job.getInputTopic());
+                System.out.println("🗑️ Джоба остановлена и удалена: " + job.getId());
+            } else {
+                System.out.println("⚠️ Попытка удалить несуществующую джобу: " + job.getId());
+            }
+        } else {
+            ctx.getBroadcastState(jobDescriptor).put(job.getInputTopic(), job);
+            System.out.println("📡 Джоба активна: " + job.getId() + " -> " + job.getInputTopic());
+        }
     }
 
     @Override
@@ -40,4 +51,7 @@ public class JobKeyedBroadcastProcessor extends KeyedBroadcastProcessFunction<St
             System.out.println("⛔ Джоба для топика " + data.getSourceTopic() + " не найдена. Данные пропущены.");
         }
     }
+
+
+
 }

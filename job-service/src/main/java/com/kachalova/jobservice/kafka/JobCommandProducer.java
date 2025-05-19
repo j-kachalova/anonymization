@@ -16,14 +16,14 @@ public class JobCommandProducer {
     private final KafkaTemplate<String, String> kafkaTemplate; // <- теперь тип String
     private final ObjectMapper objectMapper;
     private final TopicService topicService;
-    private static final String START_JOB_TOPIC = "job-commands-start";
-    private static final String STOP_JOB_TOPIC = "job-commands-stop";
+    private static final String JOB_TOPIC = "job-commands";
+
 
     public void sendStartCommand(JobResponseDto jobResponseDto) {
         topicService.createTopic(jobResponseDto.getInputTopic(), 1, (short) 1);
         try {
             String json = objectMapper.writeValueAsString(jobResponseDto); // ✅ сериализация
-            kafkaTemplate.send(START_JOB_TOPIC, json);
+            kafkaTemplate.send(JOB_TOPIC, json);
             log.info("✅ Sent START command as JSON for jobId {}: {}", jobResponseDto.getId(), json);
         } catch (JsonProcessingException e) {
             log.error("❌ Ошибка сериализации при отправке старта джобы", e);
@@ -33,10 +33,11 @@ public class JobCommandProducer {
     public void sendStopCommand(JobResponseDto jobResponseDto) {
         try {
             String json = objectMapper.writeValueAsString(jobResponseDto);
-            kafkaTemplate.send(STOP_JOB_TOPIC, json);
+            kafkaTemplate.send(JOB_TOPIC, json);
             log.info("✅ Sent STOP command as JSON for jobId {}: {}", jobResponseDto.getId(), json);
         } catch (JsonProcessingException e) {
             log.error("❌ Ошибка сериализации при отправке остановки джобы", e);
         }
     }
+
 }

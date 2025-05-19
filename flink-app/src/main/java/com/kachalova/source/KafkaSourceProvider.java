@@ -14,7 +14,7 @@ public class KafkaSourceProvider {
     public static KafkaSource<JobResponseDto> createJobKafkaSource() {
         return KafkaSource.<JobResponseDto>builder()
                 .setBootstrapServers(BOOTSTRAP_SERVERS)
-                .setTopics("job-commands-start")
+                .setTopics("job-commands")
                 .setGroupId("job-group")
                 .setValueOnlyDeserializer(new com.kachalova.deserialization.JobResponseDtoDeserializer())
                 .setStartingOffsets(OffsetsInitializer.earliest())
