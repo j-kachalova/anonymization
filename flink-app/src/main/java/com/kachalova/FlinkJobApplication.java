@@ -35,8 +35,8 @@ public class FlinkJobApplication {
                 .connect(jobStream)
                 .process(new JobKeyedBroadcastProcessor(jobDescriptor))
                 .map(JsonUtil::toJson)
-                .print();
-             //   .sinkTo(KafkaResultSinkProvider.createKafkaSink("job-commands-stop"));
+              //  .print();
+                .sinkTo(KafkaResultSinkProvider.createKafkaSink("kafka-file-output"));
 
         env.execute("Flink Dynamic Anonymization Job");
     }
