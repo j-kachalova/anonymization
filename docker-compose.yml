@@ -64,8 +64,13 @@ services:
       - 8084:8084
     environment:
       KAFKA_SERVER: kafka:9092
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ruleset_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       - kafka
+      - postgres
 
 
   zookeeper:

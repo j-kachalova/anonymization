@@ -1,15 +1,13 @@
 package com.kachalova.fileprocessing.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PersonalData {
+public class PersonalDataDTO {
+
     private String phone;
     private String email;
     private String birthDate;
@@ -19,5 +17,4 @@ public class PersonalData {
     private String inn;
     private String snils;
     private String card;
-    private String sourceTopic;
 }

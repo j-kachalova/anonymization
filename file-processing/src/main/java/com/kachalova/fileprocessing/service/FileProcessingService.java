@@ -1,7 +1,7 @@
 package com.kachalova.fileprocessing.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kachalova.fileprocessing.dto.PersonalData;
+import com.kachalova.fileprocessing.kafka.PersonalData;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
