@@ -13,13 +13,16 @@ public class GatewayConfig {
         return builder.routes()
                 // Маршрут для RuleSet Service
                 .route("ruleset_route", r -> r.path("/api/rulesets/**")
-                        .uri("http://ruleset:8082"))  // Статический URI для Ruleset Service
+                        .uri("http://ruleset:8082"))
                 // Маршрут для Job Service
                 .route("job_route", r -> r.path("/api/jobs/**")
-                        .uri("http://job-service:8083"))  // Статический URI для Job Service
-                // Маршрут для File Processing Service
+                        .uri("http://job-service:8083"))
+                // Маршрут для File Processing Service (файлы)
                 .route("file_route", r -> r.path("/files/**")
-                        .uri("http://file-processing:8084"))  // Статический URI для File Processing Service
+                        .uri("http://file-processing:8084"))
+                // Маршрут для File Processing Service (анонимизация)
+                .route("anonymization_route", r -> r.path("/api/anonymization/**")
+                        .uri("http://file-processing:8084"))
                 .build();
     }
 }

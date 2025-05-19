@@ -12,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class KafkaData {
-    private UUID userId;
+    private UUID id;
     private String phone;
     private String email;
     private String birthDate;

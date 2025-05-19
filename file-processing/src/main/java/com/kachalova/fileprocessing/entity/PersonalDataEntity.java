@@ -15,7 +15,7 @@ public class PersonalDataEntity {
 
     @Id
     @GeneratedValue
-    private UUID userId;
+    private UUID id;
 
     private String phone;
     private String email;

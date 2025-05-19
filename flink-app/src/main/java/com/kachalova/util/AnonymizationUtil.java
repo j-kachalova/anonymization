@@ -27,7 +27,7 @@ public class AnonymizationUtil {
         switch (field) {
             case "phone" -> data.setPhone(maskValue(data.getPhone(), mask));
             case "email" -> data.setEmail(maskValue(data.getEmail(), mask));
-            case "userId" -> data.setUserId(maskValue(data.getUserId(), mask));
+            case "id" -> data.setId(maskValue(data.getId(), mask));
             case "passport" -> data.setPassport(maskValue(data.getPassport(), mask));
             case "address" -> data.setAddress(maskValue(data.getAddress(), mask));
             case "inn" -> data.setInn(maskValue(data.getInn(), mask));
@@ -42,7 +42,7 @@ public class AnonymizationUtil {
         switch (field) {
             case "phone" -> data.setPhone(null);
             case "email" -> data.setEmail(null);
-            case "userId" -> data.setUserId(null);
+            case "id" -> data.setId(null);
             case "passport" -> data.setPassport(null);
             case "address" -> data.setAddress(null);
             case "inn" -> data.setInn(null);
@@ -57,7 +57,7 @@ public class AnonymizationUtil {
         switch (field) {
             case "phone" -> data.setPhone(hash(data.getPhone()));
             case "email" -> data.setEmail(hash(data.getEmail()));
-            case "userId" -> data.setUserId(hash(data.getUserId()));
+            case "id" -> data.setId(hash(data.getId()));
             case "passport" -> data.setPassport(hash(data.getPassport()));
             case "address" -> data.setAddress(hash(data.getAddress()));
             case "inn" -> data.setInn(hash(data.getInn()));

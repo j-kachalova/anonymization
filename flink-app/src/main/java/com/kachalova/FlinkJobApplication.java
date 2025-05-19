@@ -29,7 +29,7 @@ public class FlinkJobApplication {
         KeyedStream<PersonalData, String> dataStream = env
                 .fromSource(KafkaSourceProvider.createDataKafkaSourceWildcard(), WatermarkStrategy.noWatermarks(), "Data Source")
                 .map(json -> JsonUtil.fromJson(json, PersonalData.class))
-                .keyBy(PersonalData::getUserId);
+                .keyBy(PersonalData::getId);
 
         dataStream
                 .connect(jobStream)

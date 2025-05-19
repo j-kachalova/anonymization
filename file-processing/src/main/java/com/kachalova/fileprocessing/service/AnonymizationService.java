@@ -43,7 +43,7 @@ public class AnonymizationService {
     }
     public Optional<PersonalDataDTO> getOriginalDtoByAnonymizedId(UUID anonymizedId) {
         return linkRepo.findByAnonymizedData_Id(anonymizedId)
-                .flatMap(link -> originalRepo.findById(link.getPersonalData().getUserId()))
+                .flatMap(link -> originalRepo.findById(link.getPersonalData().getId()))
                 .map(originalDataMapper::toDto);
     }
     public List<PersonalDataEntity> getAllPersonalData() {

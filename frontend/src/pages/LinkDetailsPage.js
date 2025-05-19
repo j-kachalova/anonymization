@@ -58,7 +58,7 @@ const LinkDetailsPage = () => {
                         {Object.keys(fieldLabels).map(field => (
                             <TableRow key={field}>
                                 <TableCell sx={{ fontWeight: 'bold' }}>{fieldLabels[field]}</TableCell>
-                                <TableCell>{link.originalData?.[field] || '—'}</TableCell>
+                                <TableCell>{link.personalData?.[field] || '—'}</TableCell>
                                 <TableCell>{link.anonymizedData?.[field] || '—'}</TableCell>
                             </TableRow>
                         ))}

@@ -55,10 +55,10 @@ const LinkTablePage = () => {
         const term = searchTerm.toLowerCase();
 
         return selectedColumns.some(col => {
-            const originalValue = link.originalData?.[col]?.toString().toLowerCase() || '';
+            const personalValue = link.personalData?.[col]?.toString().toLowerCase() || '';
             const anonymizedValue = link.anonymizedData?.[col]?.toString().toLowerCase() || '';
 
-            return originalValue.includes(term) || anonymizedValue.includes(term);
+            return personalValue.includes(term) || anonymizedValue.includes(term);
         });
     });
 
@@ -104,7 +104,7 @@ const LinkTablePage = () => {
                         <TableRow>
                             {selectedColumns.map(col => (
                                 <React.Fragment key={col}>
-                                    <TableCell>{ALL_COLUMNS.find(c => c.key === col)?.label} (Original)</TableCell>
+                                    <TableCell>{ALL_COLUMNS.find(c => c.key === col)?.label} (Personal)</TableCell>
                                     <TableCell>{ALL_COLUMNS.find(c => c.key === col)?.label} (Anonymized)</TableCell>
                                 </React.Fragment>
                             ))}
@@ -120,7 +120,7 @@ const LinkTablePage = () => {
                             >
                                 {selectedColumns.map(col => (
                                     <React.Fragment key={col}>
-                                        <TableCell>{link.originalData?.[col] ?? '—'}</TableCell>
+                                        <TableCell>{link.personalData?.[col] ?? '—'}</TableCell>
                                         <TableCell>{link.anonymizedData?.[col] ?? '—'}</TableCell>
                                     </React.Fragment>
                                 ))}

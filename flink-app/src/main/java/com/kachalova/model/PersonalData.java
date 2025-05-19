@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class PersonalData {
-    private String userId;
+    private String id;
     private String phone;
     private String email;
     private String birthDate;

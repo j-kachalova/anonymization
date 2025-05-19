@@ -44,7 +44,7 @@ public class FileProcessingConsumer {
 
             // Сохраняем связь
             LinkTable link = new LinkTable();
-            link.setPersonalData(personalDataRepository.findById(kafkaData.getUserId()).get());
+            link.setPersonalData(personalDataRepository.findById(kafkaData.getId()).get());
             link.setAnonymizedData(anonymized);
 
             linkTableRepository.save(link);
@@ -52,6 +52,7 @@ public class FileProcessingConsumer {
             System.out.println("✅ Данные сохранены: " + kafkaData+link);
 
         } catch (Exception e) {
+            System.out.println("ОШИБКА");
             e.printStackTrace();
         }
         // Здесь можно обрабатывать полученные сообщения
