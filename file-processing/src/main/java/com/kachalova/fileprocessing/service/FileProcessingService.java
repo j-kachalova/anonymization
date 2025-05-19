@@ -1,33 +1,53 @@
 package com.kachalova.fileprocessing.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kachalova.fileprocessing.FileDataDTO;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FileProcessingService {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    public FileProcessingService(KafkaTemplate<String, String> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
+    private static final String TOPIC = "your-kafka-topic"; // замените на ваш актуальный топик
 
-    public void processFile(MultipartFile file) throws IOException {
-        // Преобразуем файл в строку или обработаем по частям
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Разбиение на отдельные сообщения
-                kafkaTemplate.send("your-kafka-topic", line);
+    public void processFile(MultipartFile file) {
+        try (CSVParser parser = new CSVParser(
+                new InputStreamReader(file.getInputStream()),
+                CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+
+            List<CSVRecord> records = parser.getRecords();
+
+            for (CSVRecord record : records) {
+                FileDataDTO dto = FileDataDTO.builder()
+                        .birthDate(record.get("birthDate"))
+                        .birthPlace(record.get("birthPlace"))
+                        .passport(record.get("passport"))
+                        .address(record.get("address"))
+                        .phone(record.get("phone"))
+                        .email(record.get("email"))
+                        .inn(record.get("inn"))
+                        .snils(record.get("snils"))
+                        .card(record.get("card"))
+                        .build();
+
+                String json = objectMapper.writeValueAsString(dto);
+                kafkaTemplate.send(TOPIC, json);
             }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при обработке файла: " + e.getMessage(), e);
         }
     }
 }
-
