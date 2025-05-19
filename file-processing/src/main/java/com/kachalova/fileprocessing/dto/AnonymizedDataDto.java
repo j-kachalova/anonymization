@@ -1,26 +1,23 @@
-package com.kachalova.fileprocessing.kafka;
+package com.kachalova.fileprocessing.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class PersonalData {
-    private UUID userId;
-    private String phone;
-    private String email;
+public class AnonymizedDataDto {
     private String birthDate;
     private String birthPlace;
     private String passport;
     private String address;
+    private String phone;
+    private String email;
     private String inn;
     private String snils;
     private String card;
-    private String sourceTopic;
+
 }

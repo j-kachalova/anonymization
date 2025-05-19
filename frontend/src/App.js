@@ -10,6 +10,9 @@ import CreateJobPage from "./pages/CreateJobPage";
 import UpdateJobPage from "./pages/UpdateJobPage";
 import FileUploadPage from "./pages/FileUploadPage";
 import Home from "./pages/Home";
+import AnonymizedPage from "./pages/AnonymizedPage";
+import LinkTablePage from "./pages/LinkTablePage";
+import LinkDetailsPage from "./pages/LinkDetailsPage";
 
 function App() {
     return (
@@ -24,6 +27,9 @@ function App() {
                 <Route path="/create-job" element={<CreateJobPage />} />
                 <Route path="/jobs/:id/edit" element={<UpdateJobPage />} />
                 <Route path="/file" element={<FileUploadPage />} />
+                <Route path="/anonymized" element={<AnonymizedPage />} />
+                <Route path="/links" element={<LinkTablePage />} />
+                <Route path="/link-details/:id" element={<LinkDetailsPage />} />
             </Routes>
         </Router>
     );

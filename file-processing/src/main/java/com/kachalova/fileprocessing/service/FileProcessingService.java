@@ -3,7 +3,7 @@ package com.kachalova.fileprocessing.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kachalova.fileprocessing.dto.PersonalDataDTO;
 import com.kachalova.fileprocessing.entity.PersonalDataEntity;
-import com.kachalova.fileprocessing.kafka.PersonalData;
+import com.kachalova.fileprocessing.kafka.KafkaData;
 import com.kachalova.fileprocessing.mapper.PersonalDataMapper;
 import com.kachalova.fileprocessing.repository.PersonalDataRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,9 +48,9 @@ public class FileProcessingService {
                         .build();
                 PersonalDataEntity entity = personalDataMapper.toEntity(dto);
                 personalDataRepository.save(entity);
-                PersonalData personalData = personalDataMapper.toKafkaModel(entity);
-                personalData.setSourceTopic(TOPIC);
-                String json = objectMapper.writeValueAsString(personalData);
+                KafkaData kafkaData = personalDataMapper.toKafkaModel(entity);
+                kafkaData.setSourceTopic(TOPIC);
+                String json = objectMapper.writeValueAsString(kafkaData);
                 kafkaTemplate.send(TOPIC, json);
             }
 

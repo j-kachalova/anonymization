@@ -17,7 +17,12 @@ function Home() {
                 <Button variant="contained" color="primary" component={Link} to="/file">
                     Отправить данные
                 </Button>
-
+                <Button variant="contained" color="primary" component={Link} to="/anonymized">
+                    Обезличенные данные
+                </Button>
+                <Button variant="contained" color="primary" component={Link} to="/links">
+                    Все данные
+                </Button>
             </Stack>
         </div>
     );
