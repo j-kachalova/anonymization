@@ -12,7 +12,7 @@ function Home() {
                     Правила обезличивания
                 </Button>
                 <Button variant="contained" color="primary" component={Link} to="/jobs">
-                    Задания
+                    Задачи
                 </Button>
                 <Button variant="contained" color="primary" component={Link} to="/file">
                     Отправить данные

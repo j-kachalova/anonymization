@@ -14,7 +14,7 @@ public class AnonymizationUtil {
 
     public static PersonalData apply(PersonalData data, AnonymizationRuleDto rule) {
         switch (rule.getMethod()) {
-            case "MASK" -> applyMask(data, rule.getFieldName(), rule.getParameters());
+            case "MASK" -> applyMask(data, rule.getFieldName(), "*");
             case "DELETE" -> applyDelete(data, rule.getFieldName());
             case "HASH" -> applyHash(data, rule.getFieldName());
             case "GENERALIZE" -> applyGeneralization(data, rule.getFieldName(), rule.getParameters());

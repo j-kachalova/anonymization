@@ -17,7 +17,6 @@ import { useNavigate } from 'react-router-dom';
 const CreateJobPage = () => {
     const [name, setName] = useState('');
     const [inputTopic, setInputTopic] = useState('');
-    const [outputTopic, setOutputTopic] = useState('');
     const [ruleSetId, setRuleSetId] = useState('');
     const [ruleSets, setRuleSets] = useState([]);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
@@ -37,7 +36,7 @@ const CreateJobPage = () => {
     }, []);
 
     const handleCreateJob = async () => {
-        if (!name || !inputTopic || !outputTopic || !ruleSetId) {
+        if (!name || !inputTopic || !ruleSetId) {
             setSnackbar({ open: true, message: 'Заполните все поля', severity: 'error' });
             return;
         }
@@ -45,7 +44,6 @@ const CreateJobPage = () => {
         const newJob = {
             name,
             inputTopic,
-            outputTopic,
             ruleSet: {
                 id: ruleSetId
             }
@@ -91,20 +89,11 @@ const CreateJobPage = () => {
                 />
 
                 <TextField
-                    label="Входной топик"
+                    label="Входной топик для данных"
                     variant="outlined"
                     fullWidth
                     value={inputTopic}
                     onChange={(e) => setInputTopic(e.target.value)}
-                    style={{ marginBottom: '20px' }}
-                />
-
-                <TextField
-                    label="Выходной топик"
-                    variant="outlined"
-                    fullWidth
-                    value={outputTopic}
-                    onChange={(e) => setOutputTopic(e.target.value)}
                     style={{ marginBottom: '20px' }}
                 />
 
