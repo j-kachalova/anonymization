@@ -18,7 +18,7 @@ public class JobRequestDto {
     @NotBlank
     private String inputTopic;
 
-    @NotBlank
+
     private String outputTopic;
 
     @NotNull
