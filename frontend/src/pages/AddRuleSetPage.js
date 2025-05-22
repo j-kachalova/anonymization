@@ -71,18 +71,19 @@ const AddRuleSetPage = () => {
     return (
         <div style={{ padding: '20px' }}>
             <Paper style={{ padding: '20px' }}>
-                <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={handleGoBack}
-                    style={{ marginBottom: '20px' }}
-                >
-                    Назад
-                </Button>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                    <Button variant="outlined" color="secondary" onClick={handleGoBack}>
+                        Назад
+                    </Button>
+                    <Button variant="outlined" color="primary" onClick={() => navigate('/')}>
+                        На главную
+                    </Button>
+                </div>
 
                 <Typography variant="h4" gutterBottom>
                     Добавить новый набор правил
                 </Typography>
+
 
                 <TextField
                     label="Название"

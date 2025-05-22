@@ -53,15 +53,14 @@ const RuleTablePage = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            {/* Кнопка "Назад" */}
             <Button
                 variant="outlined"
-                onClick={handleGoBack}
+                color="secondary"
+                onClick={() => navigate('/')}
                 style={{ marginBottom: '20px' }}
             >
-                Назад
+                На главную
             </Button>
-
             {/* Кнопка "Добавить набор правил" */}
             <Button
                 variant="contained"

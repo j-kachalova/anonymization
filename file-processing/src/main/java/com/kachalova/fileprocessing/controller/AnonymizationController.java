@@ -1,15 +1,18 @@
 package com.kachalova.fileprocessing.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.kachalova.fileprocessing.dto.AnonymizedDataDto;
 import com.kachalova.fileprocessing.dto.PersonalDataDTO;
 import com.kachalova.fileprocessing.entity.AnonymizedData;
 import com.kachalova.fileprocessing.entity.LinkTable;
 import com.kachalova.fileprocessing.entity.PersonalDataEntity;
+import com.kachalova.fileprocessing.kafka.FileProcessingService;
 import com.kachalova.fileprocessing.mapper.PersonalDataMapper;
 import com.kachalova.fileprocessing.service.AnonymizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,17 +25,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AnonymizationController {
 
+    private final FileProcessingService fileProcessingService;
     private final AnonymizationService anonymizationService;
     private final PersonalDataMapper originalDataMapper;
-/*
+
     @PostMapping("/anonymizeData")
-    public ResponseEntity<?> anonymizeData(@RequestBody OriginalDataDto dto) {
-        OriginalData data = anonymizationService.saveOriginal(dto);
-        UUID id = data.getId();
-        kafkaProducer.sendOriginalDataDto(id, dto);
-        return ResponseEntity.ok("Данные отправлены в Kafka для анонимизации");
+    public ResponseEntity<?> anonymizeData(@RequestBody PersonalDataDTO dto, @RequestParam("inputTopic") String inputTopic) throws JsonProcessingException {
+        try {
+        fileProcessingService.process(dto, inputTopic);
+        return ResponseEntity.ok("Данные отправлены в Kafka для обезличивания в топик" + inputTopic);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка при обработке данных: " + e.getMessage());
+        }
     }
-*/
+
 
     // 3. Получить обезличенные данные по анонимному ID
     @GetMapping("/anonymized/{anonymizedId}")

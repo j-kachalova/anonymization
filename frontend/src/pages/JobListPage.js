@@ -85,23 +85,27 @@ const JobListPage = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <Button
-                variant="outlined"
-                onClick={handleGoBack}
-                style={{ marginBottom: '20px', marginRight: '10px' }}
-            >
-                Назад
-            </Button>
+            <div style={{marginBottom: '20px'}}>
 
-            <Button
-                variant="contained"
-                color="primary"
-                component={Link}
-                to="/create-job"
-                style={{ marginBottom: '20px' }}
-            >
-                Добавить новую задачу
-            </Button>
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => navigate('/')}
+                    style={{marginRight: '10px'}}
+                >
+                    На главную
+                </Button>
+
+                <Button
+                    variant="contained"
+                    color="primary"
+                    component={Link}
+                    to="/create-job"
+                >
+                    Добавить новую задачу
+                </Button>
+            </div>
+
 
             <Typography variant="h4" gutterBottom>
                 Список задач
@@ -117,7 +121,7 @@ const JobListPage = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {jobs.map((job) => (
+                    {jobs.map((job) => (
                             <TableRow key={job.id}>
                                 <TableCell>{job.name}</TableCell>
                                 <TableCell>{job.status}</TableCell>

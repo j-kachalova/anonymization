@@ -1,5 +1,6 @@
 package com.kachalova.fileprocessing.kafka;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kachalova.fileprocessing.dto.PersonalDataDTO;
 import com.kachalova.fileprocessing.entity.PersonalDataEntity;
@@ -57,6 +58,14 @@ public class FileProcessingService {
         } catch (Exception e) {
             throw new RuntimeException("Ошибка при обработке файла: " + e.getMessage(), e);
         }
+    }
+    public void process(PersonalDataDTO dto, String inputTopic) throws JsonProcessingException {
+        PersonalDataEntity entity = personalDataMapper.toEntity(dto);
+        personalDataRepository.save(entity);
+        KafkaData kafkaData = personalDataMapper.toKafkaModel(entity);
+        kafkaData.setSourceTopic(inputTopic);
+        String json = objectMapper.writeValueAsString(kafkaData);
+        kafkaTemplate.send(inputTopic, json);
     }
 
 }
