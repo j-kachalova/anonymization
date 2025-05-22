@@ -33,7 +33,7 @@ public class AnonymizationController {
     public ResponseEntity<?> anonymizeData(@RequestBody PersonalDataDTO dto, @RequestParam("inputTopic") String inputTopic) throws JsonProcessingException {
         try {
         fileProcessingService.process(dto, inputTopic);
-        return ResponseEntity.ok("Данные отправлены в Kafka для обезличивания в топик" + inputTopic);
+        return ResponseEntity.ok("Данные отправлены в Kafka для обезличивания в топик " + inputTopic);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка при обработке данных: " + e.getMessage());
